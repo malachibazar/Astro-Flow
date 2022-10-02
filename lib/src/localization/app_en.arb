@@ -1,0 +1,6 @@
+{
+  "appTitle": "astro_flow",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}
