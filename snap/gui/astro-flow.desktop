@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Astro Flow
 Comment=Astro Flow is a focus timer based on the Flowtime method.
-Exec=astro_flow
+Exec=astro-flow
 Icon=${SNAP}/meta/gui/icon.png
 Terminal=false
 Type=Application
