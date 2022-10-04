@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:astro_flow/src/settings/settings_controller.dart';
-import 'package:astro_flow/src/settings/settings_view.dart';
+import 'package:astro_flow/models/timer_model.dart';
+import 'package:astro_flow/screens/settings_view.dart';
 import 'package:flutter/material.dart';
 
 String formatTime(int milliseconds) {
@@ -76,12 +76,12 @@ class StopwatchControl extends StatefulWidget {
 }
 
 class _StopwatchControlState extends State<StopwatchControl> {
+  
+  // Initialize the Timer model.
+  TimerModel timerModel = TimerModel();
+  
   late Stopwatch _stopwatch;
   late Timer _timer;
-  // Tracks if on break or on work
-  bool _onBreak = false;
-  // Tracks the number of milliseconds needed for the break
-  int _breakTime = 0;
   @override
   void initState() {
     super.initState();
@@ -91,8 +91,11 @@ class _StopwatchControlState extends State<StopwatchControl> {
       setState(() {
         // If the stopwatch is on break, decrease the break time by 30ms.
         // Also, the break time should never be less than 0.
-        if (_onBreak) {
-          _breakTime = (_breakTime - 30).clamp(0, _breakTime);
+        if (timerModel.onBreak) {
+          timerModel.timeRemaining = (timerModel.timeRemaining - 30).clamp(0, timerModel.timeRemaining);
+        } else if (!timerModel.onBreak && _stopwatch.isRunning) {
+          // If the stopwatch is not on break, increase the work time by 30ms.
+          timerModel.workTime = _stopwatch.elapsedMilliseconds;
         }
       });
     });
@@ -118,12 +121,12 @@ class _StopwatchControlState extends State<StopwatchControl> {
     return Column(
       children: [
         Text(
-          _onBreak ? 'Spacing Out' : 'Working',
+          timerModel.onBreak ? 'Spacing Out' : 'Working',
           style: const TextStyle(fontSize: 24),
         ),
         const SizedBox(height: 5),
         Text(
-          formatTime(_onBreak ? _breakTime : _stopwatch.elapsedMilliseconds),
+          formatTime(timerModel.onBreak ? timerModel.timeRemaining : timerModel.workTime),
           style: const TextStyle(fontSize: 48.0),
         ),
         const SizedBox(
@@ -149,11 +152,16 @@ class _StopwatchControlState extends State<StopwatchControl> {
                 IconButton(
                   onPressed: () {
                     setState(() {
-                      _onBreak = !_onBreak;
+                      timerModel.onBreak = !timerModel.onBreak;
                       // If the stopwatch is on break, set the break time.
-                      if (_onBreak) {
-                        _breakTime =
+                      if (timerModel.onBreak) {
+                        var breakTime =
                             calculateBreakTime(_stopwatch.elapsedMilliseconds);
+                        timerModel.timeRemaining = breakTime;
+                        timerModel.breakTime = breakTime;
+                      } else {
+                        // If the stopwatch is not on break, reset the work time.
+                        timerModel.workTime = 0;
                       }
                       _stopwatch.reset();
                     });
