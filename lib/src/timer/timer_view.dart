@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:astro_flow/src/settings/settings_controller.dart';
+import 'package:astro_flow/src/settings/settings_view.dart';
 import 'package:flutter/material.dart';
 
 String formatTime(int milliseconds) {
@@ -18,7 +20,9 @@ int calculateBreakTime(int milliseconds) {
   // If the minutes are 25-50, return 10 minutes.
   // Otherwise, return 15 minutes.
   // This needs to return milliseconds.
-  if (minutes < 5) {
+  if (minutes < 1) {
+    return 0;
+  } else if (minutes < 5) {
     return 2 * 60000;
   } else if (minutes < 25) {
     return 5 * 60000;
@@ -35,13 +39,29 @@ class TimerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            StopwatchControl(),
-          ],
-        ),
+      body: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(SettingsView.routeName);
+                  },
+                  icon: const Icon(Icons.settings_rounded),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              StopwatchControl(),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -129,13 +149,13 @@ class _StopwatchControlState extends State<StopwatchControl> {
                 IconButton(
                   onPressed: () {
                     setState(() {
-                      _stopwatch.reset();
                       _onBreak = !_onBreak;
                       // If the stopwatch is on break, set the break time.
                       if (_onBreak) {
-                        _breakTime = calculateBreakTime(
-                            _stopwatch.elapsedMilliseconds);
+                        _breakTime =
+                            calculateBreakTime(_stopwatch.elapsedMilliseconds);
                       }
+                      _stopwatch.reset();
                     });
                   },
                   icon: const Icon(Icons.arrow_forward_rounded),
