@@ -58,6 +58,7 @@ class SettingsView extends StatelessWidget {
               value: controller.autoStartFocus,
               // Call the updateAutoStartFocus method any time the user toggles the switch.
               onChanged: controller.updateAutoStartFocus,
+              inactiveThumbColor: Theme.of(context).colorScheme.secondary,
             ),
           ],
         ),
