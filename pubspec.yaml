@@ -15,6 +15,11 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   shared_preferences: ^2.0.0
+  flutter_local_notifications: ^9.7.0
+  timezone: ^0.8.0
+  rxdart: ^0.27.5
+  # audioplayers: ^1.1.0
+
 
 dev_dependencies:
   flutter_test:
@@ -31,3 +36,5 @@ flutter:
   assets:
     # Add assets from the images directory to the application.
     - assets/images/
+    # Add assets from the sounds directory to the application.
+    - assets/sounds/

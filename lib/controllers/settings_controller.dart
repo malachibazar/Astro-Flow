@@ -17,14 +17,22 @@ class SettingsController with ChangeNotifier {
   // also persisting the changes with the SettingsService.
   late ThemeMode _themeMode;
 
+  // Make autoStartFocus a private variable so it is not updated directly without
+  // also persisting the changes with the SettingsService.
+  late bool _autoStartFocus;
+
   // Allow Widgets to read the user's preferred ThemeMode.
   ThemeMode get themeMode => _themeMode;
+
+  // Allow Widgets to read the user's preferred autoStartFocus.
+  bool get autoStartFocus => _autoStartFocus;
 
   /// Load the user's settings from the SettingsService. It may load from a
   /// local database or the internet. The controller only knows it can load the
   /// settings from the service.
   Future<void> loadSettings() async {
     _themeMode = await _settingsService.themeMode();
+    _autoStartFocus = await _settingsService.autoStartFocus();
 
     // Important! Inform listeners a change has occurred.
     notifyListeners();
@@ -46,5 +54,23 @@ class SettingsController with ChangeNotifier {
     // Persist the changes to a local database or the internet using the
     // SettingService.
     await _settingsService.updateThemeMode(newThemeMode);
+  }
+
+  /// Update and persist the autoStartFocus based on the user's selection.
+  Future<void> updateAutoStartFocus(bool? newAutoStartFocus) async {
+    if (newAutoStartFocus == null) return;
+
+    // Do not perform any work if new and old autoStartFocus are identical
+    if (newAutoStartFocus == _autoStartFocus) return;
+
+    // Otherwise, store the new autoStartFocus in memory
+    _autoStartFocus = newAutoStartFocus;
+
+    // Important! Inform listeners a change has occurred.
+    notifyListeners();
+
+    // Persist the changes to a local database or the internet using the
+    // SettingService.
+    await _settingsService.updateAutoStartFocus(newAutoStartFocus);
   }
 }

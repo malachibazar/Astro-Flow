@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
                   default:
-                    return const TimerView();
+                    return TimerView(controller: settingsController);
                 }
               },
             );

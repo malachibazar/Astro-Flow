@@ -10,12 +10,15 @@ class TimerModel {
   int workTime;
   // Time remaining tracks how many milliseconds the user has left to be on break.
   int timeRemaining;
-  
+  // Break finished notification sent
+  bool breakFinishedNotificationSent;
+
   // Constructor
   TimerModel({
     this.onBreak = false,
     this.breakTime = 0,
     this.workTime = 0,
     this.timeRemaining = 0,
+    this.breakFinishedNotificationSent = false,
   });
 }
