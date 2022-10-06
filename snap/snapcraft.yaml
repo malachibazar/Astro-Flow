@@ -11,7 +11,7 @@ grade: stable
 apps:
   astro-flow:
     command: astro_flow
-    extensions: [flutter-beta] # Where "master" defines which Flutter channel to use for the build
+    extensions: [flutter-stable] # Where "master" defines which Flutter channel to use for the build
 parts:
   astro-flow:
     source: .
