@@ -1,5 +1,5 @@
 name: astro-flow
-version: 0.1.4
+version: 0.2.0
 summary: Astro Flow
 description: |
   Astro Flow is a focus timer based on the Flowtime method.
@@ -11,7 +11,7 @@ grade: stable
 apps:
   astro-flow:
     command: astro_flow
-    extensions: [flutter-stable] # Where "master" defines which Flutter channel to use for the build
+    extensions: [flutter-master] # Where "master" defines which Flutter channel to use for the build
 parts:
   astro-flow:
     source: .

@@ -1,3 +1,4 @@
+import 'package:astro_flow/models/settings_model.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,20 +29,20 @@ class SettingsService {
   }
 
   Future<void> updateAutoStartFocus(bool autoStartFocus) async {
-    // Persist the user's preferred ThemeMode to local storage
+    // Persist the user's preferred auto start focus mode to local storage
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool('autoStartFocus', autoStartFocus);
   }
 
   Future<bool> autoStartFocus() async {
-    // Load the user's preferred ThemeMode from local storage
+    // Load the user's preferred auto start focus from local storage
     final preferences = await SharedPreferences.getInstance();
     final autoStartFocus = preferences.getBool('autoStartFocus');
 
-    // If the user has not set a preferred ThemeMode, return the system default.
+    // If the user has not set a preferred auto start focus, return the system default.
     if (autoStartFocus == null) return false;
 
-    // Otherwise, return the user's preferred ThemeMode.
+    // Otherwise, return the user's preferred auto start focus.
     return autoStartFocus;
   }
 }

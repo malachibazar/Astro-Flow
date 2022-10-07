@@ -1,8 +1,4 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:rxdart/rxdart.dart';
-
 
 class LocalNotificationService {
   LocalNotificationService();
@@ -10,17 +6,14 @@ class LocalNotificationService {
   final _localNotificationService = FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
-
-
     LinuxInitializationSettings initializationSettingsLinux =
         const LinuxInitializationSettings(
       defaultActionName: 'Get notified, fool!',
       defaultSuppressSound: false,
     );
 
-    InitializationSettings initializationSettings =
-        InitializationSettings(
-          linux: initializationSettingsLinux,
+    InitializationSettings initializationSettings = InitializationSettings(
+      linux: initializationSettingsLinux,
     );
 
     await _localNotificationService.initialize(
@@ -30,7 +23,6 @@ class LocalNotificationService {
   }
 
   Future<NotificationDetails> _getNotificationDetails({String? sound}) async {
-    
     LinuxNotificationDetails linuxPlatformChannelSpecifics =
         LinuxNotificationDetails(
       defaultActionName: '',
@@ -39,17 +31,18 @@ class LocalNotificationService {
       sound: sound != null ? AssetsLinuxSound('assets/sounds/$sound') : null,
     );
 
-    NotificationDetails platformChannelSpecifics =
-        NotificationDetails(
-          linux: linuxPlatformChannelSpecifics,
+    NotificationDetails platformChannelSpecifics = NotificationDetails(
+      linux: linuxPlatformChannelSpecifics,
     );
 
     return platformChannelSpecifics;
   }
 
-  Future<void> showNotification({required int id, required String title, required String body, String? sound}) async {
-    
-
+  Future<void> showNotification(
+      {required int id,
+      required String title,
+      required String body,
+      String? sound}) async {
     final NotificationDetails notificationDetails =
         await _getNotificationDetails(sound: sound);
 
@@ -62,6 +55,6 @@ class LocalNotificationService {
   }
 
   void onSelectNotification(String? payload) {
-    print(payload);
+    // print(payload);
   }
 }

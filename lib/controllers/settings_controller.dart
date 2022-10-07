@@ -1,3 +1,4 @@
+import 'package:astro_flow/models/settings_model.dart';
 import 'package:flutter/material.dart';
 
 import '../services/settings_service.dart';
