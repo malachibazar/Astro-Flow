@@ -217,17 +217,20 @@ class _StopwatchControlState extends State<StopwatchControl> {
     // This means that the user has worked for 60% of the current interval.
     var currentInterval = getCurrentInterval(timerModel.workTime);
     // Current focus time.
-    var currentFocusTime = _intervals[currentInterval]!['focus']!;
+    var currentFocusTime = _intervals[currentInterval]!['focus'];
     // Previous focus time.
     // If the current interval is 1, then the previous focus time is 0.
     var previousFocusTime =
         currentInterval == 1 ? 0 : _intervals[currentInterval - 1]!['focus']!;
 
     // Calculate the percentage done.
-    var percentageDone = (timerModel.workTime - previousFocusTime) /
-        (currentFocusTime - previousFocusTime);
-
-    return percentageDone;
+    // If the current focus time is null, then return 1.
+    if (currentFocusTime == null) {
+      return 1;
+    } else {
+      return (timerModel.workTime - previousFocusTime) /
+          (currentFocusTime - previousFocusTime);
+    }
   }
 
   @override
@@ -418,10 +421,18 @@ class _StopwatchControlState extends State<StopwatchControl> {
           height: 50,
         ),
         // Description of how long it'll take to get to the next break.
-        Text(
-          'Focus for at least ${formatTime(_intervals[getCurrentInterval(timerModel.workTime)]!['focus']!)} and you can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!['break']!)}',
-          style: const TextStyle(fontSize: 16.0),
-        ),
+        if (_intervals[getCurrentInterval(timerModel.workTime)]!['focus'] !=
+            null)
+          Text(
+            'Focus for at least ${formatTime(_intervals[getCurrentInterval(timerModel.workTime)]!['focus']!)} and you can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!['break']!)}',
+            style: const TextStyle(fontSize: 16.0),
+          ),
+        if (_intervals[getCurrentInterval(timerModel.workTime)]!['focus'] ==
+            null)
+          Text(
+            'You can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!['break']!)}',
+            style: const TextStyle(fontSize: 16.0),
+          ),
       ],
     );
   }
