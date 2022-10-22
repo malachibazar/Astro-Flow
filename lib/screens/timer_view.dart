@@ -128,6 +128,8 @@ class _StopwatchControlState extends State<StopwatchControl> {
               timerModel.timeRemaining = 0;
               // Set work time to 0.
               timerModel.workTime = 0;
+              // Restart the stopwatch.
+              _stopwatch.reset();
             }
           }
           timerModel.timeRemaining =
@@ -328,12 +330,13 @@ class _StopwatchControlState extends State<StopwatchControl> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  IconButton(
-                                    onPressed: handleStartStop,
-                                    icon: Icon(_stopwatch.isRunning
-                                        ? Icons.pause_rounded
-                                        : Icons.play_arrow_rounded),
-                                  ),
+                                  if (!timerModel.onBreak)
+                                    IconButton(
+                                      onPressed: handleStartStop,
+                                      icon: Icon(_stopwatch.isRunning
+                                          ? Icons.pause_rounded
+                                          : Icons.play_arrow_rounded),
+                                    ),
                                   IconButton(
                                     onPressed: () async {
                                       // await player.setSource(AssetSource('sounds/starting-break.wav'));
@@ -420,19 +423,22 @@ class _StopwatchControlState extends State<StopwatchControl> {
         const SizedBox(
           height: 50,
         ),
-        // Description of how long it'll take to get to the next break.
-        if (_intervals[getCurrentInterval(timerModel.workTime)]!['focus'] !=
-            null)
-          Text(
-            'Focus for at least ${formatTime(_intervals[getCurrentInterval(timerModel.workTime)]!['focus']!)} and you can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!['break']!)}',
-            style: const TextStyle(fontSize: 16.0),
-          ),
-        if (_intervals[getCurrentInterval(timerModel.workTime)]!['focus'] ==
-            null)
-          Text(
-            'You can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!['break']!)}',
-            style: const TextStyle(fontSize: 16.0),
-          ),
+        // Show the amount of time earned if not on break.
+        if (!timerModel.onBreak) ...[
+          // Description of how long it'll take to get to the next break.
+          if (_intervals[getCurrentInterval(timerModel.workTime)]!['focus'] !=
+              null) ...[
+            Text(
+              'Focus for at least ${formatTime(_intervals[getCurrentInterval(timerModel.workTime)]!['focus']!)} and you can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!['break']!)}',
+              style: const TextStyle(fontSize: 16.0),
+            ),
+          ] else ...[
+            Text(
+              'You can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!['break']!)}',
+              style: const TextStyle(fontSize: 16.0),
+            ),
+          ]
+        ],
       ],
     );
   }
