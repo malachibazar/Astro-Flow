@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:astro_flow/controllers/settings_controller.dart';
+import 'package:astro_flow/models/settings_model.dart';
 import 'package:astro_flow/models/timer_model.dart';
 import 'package:astro_flow/screens/about_view.dart';
 import 'package:astro_flow/screens/settings_view.dart';
@@ -119,7 +120,7 @@ class _StopwatchControlState extends State<StopwatchControl> {
               id: 0,
               title: 'Astro Flow',
               body: 'Hey... Hey! Snap out of it! Time to focus.',
-              sound: 'break-finished.wav',
+              sound: notificationAudioMap[widget.controller.notificationAudio],
             );
 
             // Start the focus timer if the user has auto start focus enabled.

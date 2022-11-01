@@ -21,11 +21,18 @@ class SettingsController with ChangeNotifier {
   // also persisting the changes with the SettingsService.
   late bool _autoStartFocus;
 
+  // Make notificationAudio a private variable so it is not updated directly without
+  // also persisting the changes with the SettingsService.
+  late String _notificationAudio;
+
   // Allow Widgets to read the user's preferred ThemeMode.
   ThemeMode get themeMode => _themeMode;
 
   // Allow Widgets to read the user's preferred autoStartFocus.
   bool get autoStartFocus => _autoStartFocus;
+
+  // Allow Widgets to read the user's preferred notificationAudio.
+  String get notificationAudio => _notificationAudio;
 
   /// Load the user's settings from the SettingsService. It may load from a
   /// local database or the internet. The controller only knows it can load the
@@ -33,6 +40,7 @@ class SettingsController with ChangeNotifier {
   Future<void> loadSettings() async {
     _themeMode = await _settingsService.themeMode();
     _autoStartFocus = await _settingsService.autoStartFocus();
+    _notificationAudio = await _settingsService.notificationAudio();
 
     // Important! Inform listeners a change has occurred.
     notifyListeners();
@@ -72,5 +80,23 @@ class SettingsController with ChangeNotifier {
     // Persist the changes to a local database or the internet using the
     // SettingService.
     await _settingsService.updateAutoStartFocus(newAutoStartFocus);
+  }
+
+  /// Update and persist the notificationAudio based on the user's selection.
+  Future<void> updateNotificationAudio(String? newNotificationAudio) async {
+    if (newNotificationAudio == null) return;
+
+    // Do not perform any work if new and old notificationAudio are identical
+    if (newNotificationAudio == _notificationAudio) return;
+
+    // Otherwise, store the new notificationAudio in memory
+    _notificationAudio = newNotificationAudio;
+
+    // Important! Inform listeners a change has occurred.
+    notifyListeners();
+
+    // Persist the changes to a local database or the internet using the
+    // SettingService.
+    await _settingsService.updateNotificationAudio(newNotificationAudio);
   }
 }

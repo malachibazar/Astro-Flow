@@ -44,4 +44,22 @@ class SettingsService {
     // Otherwise, return the user's preferred auto start focus.
     return autoStartFocus;
   }
+
+  Future<void> updateNotificationAudio(String notificationAudio) async {
+    // Persist the user's preferred notification audio to local storage
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString('notificationAudio', notificationAudio);
+  }
+
+  Future<String> notificationAudio() async {
+    // Load the user's preferred notification audio from local storage
+    final preferences = await SharedPreferences.getInstance();
+    final notificationAudio = preferences.getString('notificationAudio');
+
+    // If the user has not set a preferred notification audio, return the system default.
+    if (notificationAudio == null) return 'Chime';
+
+    // Otherwise, return the user's preferred notification audio.
+    return notificationAudio;
+  }
 }
