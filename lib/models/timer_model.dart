@@ -22,3 +22,15 @@ class TimerModel {
     this.breakFinishedNotificationSent = false,
   });
 }
+
+class IntervalModel {
+  int? focusTime;
+  int breakTime;
+  bool triggeredNotification;
+
+  IntervalModel({
+    this.focusTime = 0,
+    this.breakTime = 0,
+    this.triggeredNotification = false,
+  });
+}

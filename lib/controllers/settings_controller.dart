@@ -25,6 +25,10 @@ class SettingsController with ChangeNotifier {
   // also persisting the changes with the SettingsService.
   late String _notificationAudio;
 
+  // Make notificationAfterFocusGoal a private variable so it is not updated directly without
+  // also persisting the changes with the SettingsService.
+  late bool _notificationAfterFocusGoal;
+
   // Allow Widgets to read the user's preferred ThemeMode.
   ThemeMode get themeMode => _themeMode;
 
@@ -34,6 +38,9 @@ class SettingsController with ChangeNotifier {
   // Allow Widgets to read the user's preferred notificationAudio.
   String get notificationAudio => _notificationAudio;
 
+  // Allow Widgets to read the user's preferred notification after focus goal.
+  bool get notificationAfterFocusGoal => _notificationAfterFocusGoal;
+
   /// Load the user's settings from the SettingsService. It may load from a
   /// local database or the internet. The controller only knows it can load the
   /// settings from the service.
@@ -41,6 +48,8 @@ class SettingsController with ChangeNotifier {
     _themeMode = await _settingsService.themeMode();
     _autoStartFocus = await _settingsService.autoStartFocus();
     _notificationAudio = await _settingsService.notificationAudio();
+    _notificationAfterFocusGoal =
+        await _settingsService.notificationAfterFocusGoal();
 
     // Important! Inform listeners a change has occurred.
     notifyListeners();
@@ -98,5 +107,25 @@ class SettingsController with ChangeNotifier {
     // Persist the changes to a local database or the internet using the
     // SettingService.
     await _settingsService.updateNotificationAudio(newNotificationAudio);
+  }
+
+  /// Update and persist the notificationAfterFocusGoal based on the user's selection.
+  Future<void> updateNotificationAfterFocusGoal(
+      bool? newNotificationAfterFocusGoal) async {
+    if (newNotificationAfterFocusGoal == null) return;
+
+    // Do not perform any work if new and old notificationAfterFocusGoal are identical
+    if (newNotificationAfterFocusGoal == _notificationAfterFocusGoal) return;
+
+    // Otherwise, store the new notificationAfterFocusGoal in memory
+    _notificationAfterFocusGoal = newNotificationAfterFocusGoal;
+
+    // Important! Inform listeners a change has occurred.
+    notifyListeners();
+
+    // Persist the changes to a local database or the internet using the
+    // SettingService.
+    await _settingsService
+        .updateNotificationAfterFocusGoal(newNotificationAfterFocusGoal);
   }
 }

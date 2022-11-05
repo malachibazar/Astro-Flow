@@ -55,6 +55,7 @@ class LocalNotificationService {
   }
 
   void onSelectNotification(String? payload) {
-    // print(payload);
+    // Focus the app when the user clicks on the notification.
+    // This is not implemented yet.
   }
 }

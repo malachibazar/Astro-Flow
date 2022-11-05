@@ -62,4 +62,25 @@ class SettingsService {
     // Otherwise, return the user's preferred notification audio.
     return notificationAudio;
   }
+
+  Future<void> updateNotificationAfterFocusGoal(
+      bool notificationForEachFocusGoal) async {
+    // Persist the user's preferred notification for each focus goal to local storage
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(
+        'notificationForEachFocusGoal', notificationForEachFocusGoal);
+  }
+
+  Future<bool> notificationAfterFocusGoal() async {
+    // Load the user's preferred notification for each focus goal from local storage
+    final preferences = await SharedPreferences.getInstance();
+    final notificationForEachFocusGoal =
+        preferences.getBool('notificationForEachFocusGoal');
+
+    // If the user has not set a preferred notification for each focus goal, return the system default.
+    if (notificationForEachFocusGoal == null) return false;
+
+    // Otherwise, return the user's preferred notification for each focus goal.
+    return notificationForEachFocusGoal;
+  }
 }

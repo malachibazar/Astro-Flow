@@ -71,7 +71,7 @@ class _SettingsViewState extends State<SettingsView> {
             ),
             const SizedBox(height: 16.0),
             Text(
-              'Auto Start Work After Break',
+              'Auto start work after break',
               style: Theme.of(context).textTheme.headline6,
             ),
             Switch(
@@ -79,6 +79,18 @@ class _SettingsViewState extends State<SettingsView> {
               value: widget.controller.autoStartFocus,
               // Call the updateAutoStartFocus method any time the user toggles the switch.
               onChanged: widget.controller.updateAutoStartFocus,
+              inactiveThumbColor: Theme.of(context).colorScheme.secondary,
+            ),
+            const SizedBox(height: 16.0),
+            Text(
+              'Send notification after reaching a focus session goal',
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            Switch(
+              // Read the autoStartFocus value from the controller
+              value: widget.controller.notificationAfterFocusGoal,
+              // Call the updateAutoStartFocus method any time the user toggles the switch.
+              onChanged: widget.controller.updateNotificationAfterFocusGoal,
               inactiveThumbColor: Theme.of(context).colorScheme.secondary,
             ),
             const SizedBox(height: 16.0),

@@ -81,23 +81,31 @@ class _StopwatchControlState extends State<StopwatchControl> {
   late Timer _timer;
 
   // The intervals and their corresponding break durations.
-  final Map<int, Map<String, int?>> _intervals = {
-    1: {
-      'focus': 25 * 60 * 1000, // Focus for 25 minutes
-      'break': 5 * 60 * 1000, // Take a 5 minute break
-    },
-    2: {
-      'focus': 50 * 60 * 1000, // Focus for 50 minutes
-      'break': 8 * 60 * 1000, // Take an 8 minute break
-    },
-    3: {
-      'focus': 90 * 60 * 1000, // Focus for 90 minutes
-      'break': 10 * 60 * 1000, // Take a 10 minute break
-    },
-    4: {
-      'focus': null, // Anything longer than 90 minutes
-      'break': 15 * 60 * 1000, // Take a 15 minute break
-    },
+  final Map<int, IntervalModel> _intervals = {
+    1: IntervalModel(
+      // Focus for 25 minutes
+      focusTime: 25 * 60 * 1000,
+      // Take a 5 minute break
+      breakTime: 5 * 60 * 1000,
+    ),
+    2: IntervalModel(
+      // Focus for 50 minutes
+      focusTime: 50 * 60 * 1000,
+      // Take an 8 minute break
+      breakTime: 8 * 60 * 1000,
+    ),
+    3: IntervalModel(
+      // Focus for 90 minutes
+      focusTime: 90 * 60 * 1000,
+      // Take a 10 minute break
+      breakTime: 10 * 60 * 1000,
+    ),
+    4: IntervalModel(
+      // Anything longer than 90 minutes
+      focusTime: null,
+      // Take a 15 minute break
+      breakTime: 15 * 60 * 1000,
+    ),
   };
 
   @override
@@ -106,16 +114,20 @@ class _StopwatchControlState extends State<StopwatchControl> {
     notificationService.initialize();
     super.initState();
     _stopwatch = Stopwatch();
-    // re-render every 30ms
-    _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
+    // re-render every 500ms
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       setState(() {
-        // If the stopwatch is on break, decrease the break time by 30ms.
+        // If the stopwatch is on break, decrease the break time by 500ms.
         // Also, the break time should never be less than 0.
         if (timerModel.onBreak) {
           // If the break time is 0, send a notification.
           if (timerModel.timeRemaining == 0 &&
               !timerModel.breakFinishedNotificationSent) {
             timerModel.breakFinishedNotificationSent = true;
+            // Reset the notification sent flag.
+            for (final interval in _intervals.keys) {
+              _intervals[interval]!.triggeredNotification = false;
+            }
             notificationService.showNotification(
               id: 0,
               title: 'Astro Flow',
@@ -134,9 +146,9 @@ class _StopwatchControlState extends State<StopwatchControl> {
             }
           }
           timerModel.timeRemaining =
-              (timerModel.timeRemaining - 30).clamp(0, timerModel.breakTime);
+              (timerModel.timeRemaining - 500).clamp(0, timerModel.breakTime);
         } else if (!timerModel.onBreak && _stopwatch.isRunning) {
-          // If the stopwatch is not on break, increase the work time by 30ms.
+          // If the stopwatch is not on break, increase the work time
           timerModel.workTime = _stopwatch.elapsedMilliseconds;
           timerModel.breakTime = calculateBreakTime(timerModel.workTime);
         }
@@ -164,14 +176,14 @@ class _StopwatchControlState extends State<StopwatchControl> {
     var minutes = milliseconds ~/ 60000;
 
     // This needs to return milliseconds.
-    if (minutes < _intervals[1]!['focus']! ~/ 60000) {
-      return _intervals[1]!['break']!;
-    } else if (minutes < _intervals[2]!['focus']! ~/ 60000) {
-      return _intervals[2]!['break']!;
-    } else if (minutes < _intervals[3]!['focus']! ~/ 60000) {
-      return _intervals[3]!['break']!;
+    if (minutes < _intervals[1]!.focusTime! ~/ 60000) {
+      return _intervals[1]!.breakTime;
+    } else if (minutes < _intervals[2]!.focusTime! ~/ 60000) {
+      return _intervals[2]!.breakTime;
+    } else if (minutes < _intervals[3]!.focusTime! ~/ 60000) {
+      return _intervals[3]!.breakTime;
     } else {
-      return _intervals[4]!['break']!;
+      return _intervals[4]!.breakTime;
     }
   }
 
@@ -181,11 +193,11 @@ class _StopwatchControlState extends State<StopwatchControl> {
     var minutes = milliseconds ~/ 60000;
 
     // Return the break time for the next interval.
-    if (minutes < _intervals[1]!['focus']! ~/ 60000) {
+    if (minutes < _intervals[1]!.focusTime! ~/ 60000) {
       return 2;
-    } else if (minutes < _intervals[2]!['focus']! ~/ 60000) {
+    } else if (minutes < _intervals[2]!.focusTime! ~/ 60000) {
       return 3;
-    } else if (minutes < _intervals[3]!['focus']! ~/ 60000) {
+    } else if (minutes < _intervals[3]!.focusTime! ~/ 60000) {
       return 4;
     } else {
       // Return 4 since there is no interval 5.
@@ -199,13 +211,46 @@ class _StopwatchControlState extends State<StopwatchControl> {
     var minutes = milliseconds ~/ 60000;
 
     // Return the break time for the next interval.
-    if (minutes < _intervals[1]!['focus']! ~/ 60000) {
+    if (minutes < _intervals[1]!.focusTime! ~/ 60000) {
       return 1;
-    } else if (minutes < _intervals[2]!['focus']! ~/ 60000) {
+    } else if (minutes < _intervals[2]!.focusTime! ~/ 60000) {
+      // Send a notification that rings twice if the user has enabled it and the notification has not been sent.
+      if (widget.controller.notificationAfterFocusGoal &&
+          !_intervals[2]!.triggeredNotification) {
+        _intervals[2]!.triggeredNotification = true;
+        notificationService.showNotification(
+          id: 1,
+          title: 'Astro Flow',
+          body: 'You\'ve finished the first interval!',
+          sound: '2-chimes.wav',
+        );
+      }
       return 2;
-    } else if (minutes < _intervals[3]!['focus']! ~/ 60000) {
+    } else if (minutes < _intervals[3]!.focusTime! ~/ 60000) {
+      // Send a notification that rings 3 times if the user has enabled it and the notification has not been sent.
+      if (widget.controller.notificationAfterFocusGoal &&
+          !_intervals[3]!.triggeredNotification) {
+        _intervals[3]!.triggeredNotification = true;
+        notificationService.showNotification(
+          id: 2,
+          title: 'Astro Flow',
+          body: 'You\'ve finished the second interval!',
+          sound: '3-chimes.wav',
+        );
+      }
       return 3;
     } else {
+      // Send a notification that rings 4 times if the user has enabled it and the notification has not been sent.
+      if (widget.controller.notificationAfterFocusGoal &&
+          !_intervals[4]!.triggeredNotification) {
+        _intervals[4]!.triggeredNotification = true;
+        notificationService.showNotification(
+          id: 3,
+          title: 'Astro Flow',
+          body: 'You\'ve finished the third interval!',
+          sound: '4-chimes.wav',
+        );
+      }
       return 4;
     }
   }
@@ -220,11 +265,11 @@ class _StopwatchControlState extends State<StopwatchControl> {
     // This means that the user has worked for 60% of the current interval.
     var currentInterval = getCurrentInterval(timerModel.workTime);
     // Current focus time.
-    var currentFocusTime = _intervals[currentInterval]!['focus'];
+    var currentFocusTime = _intervals[currentInterval]!.focusTime;
     // Previous focus time.
     // If the current interval is 1, then the previous focus time is 0.
     var previousFocusTime =
-        currentInterval == 1 ? 0 : _intervals[currentInterval - 1]!['focus']!;
+        currentInterval == 1 ? 0 : _intervals[currentInterval - 1]!.focusTime!;
 
     // Calculate the percentage done.
     // If the current focus time is null, then return 1.
@@ -427,15 +472,15 @@ class _StopwatchControlState extends State<StopwatchControl> {
         // Show the amount of time earned if not on break.
         if (!timerModel.onBreak) ...[
           // Description of how long it'll take to get to the next break.
-          if (_intervals[getCurrentInterval(timerModel.workTime)]!['focus'] !=
+          if (_intervals[getCurrentInterval(timerModel.workTime)]!.focusTime !=
               null) ...[
             Text(
-              'Focus for at least ${formatTime(_intervals[getCurrentInterval(timerModel.workTime)]!['focus']!)} and you can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!['break']!)}',
+              'Focus for at least ${formatTime(_intervals[getCurrentInterval(timerModel.workTime)]!.focusTime!)} and you can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!.breakTime)}',
               style: const TextStyle(fontSize: 16.0),
             ),
           ] else ...[
             Text(
-              'You can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!['break']!)}',
+              'You can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!.breakTime)}',
               style: const TextStyle(fontSize: 16.0),
             ),
           ]
