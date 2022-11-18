@@ -1,5 +1,5 @@
 name: astro-flow
-version: 0.5.0
+version: 0.6.0
 summary: Astro Flow
 description: |
   Astro Flow is a focus timer based on the Flowtime method.
@@ -7,7 +7,7 @@ description: |
 confinement: strict
 base: core18
 grade: stable
-    
+
 apps:
   astro-flow:
     command: astro_flow

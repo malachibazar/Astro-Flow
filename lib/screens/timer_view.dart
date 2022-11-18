@@ -50,6 +50,9 @@ class TimerView extends StatelessWidget {
               ),
             ],
           ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 2 - 300,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [StopwatchControl(controller: controller)],
@@ -383,44 +386,64 @@ class _StopwatchControlState extends State<StopwatchControl> {
                                           ? Icons.pause_rounded
                                           : Icons.play_arrow_rounded),
                                     ),
-                                  IconButton(
-                                    onPressed: () async {
-                                      // await player.setSource(AssetSource('sounds/starting-break.wav'));
-                                      setState(() {
-                                        timerModel.onBreak =
-                                            !timerModel.onBreak;
-                                        // If the stopwatch is on break, set the break time.
-                                        if (timerModel.onBreak) {
-                                          var breakTime = calculateBreakTime(
-                                              _stopwatch.elapsedMilliseconds);
-                                          timerModel.timeRemaining = breakTime;
-                                          timerModel.breakTime = breakTime;
-                                          timerModel
-                                                  .breakFinishedNotificationSent =
-                                              false;
-
-                                          // Send a notification when starting a break.
-                                          if (timerModel.breakTime > 0) {
-                                            // Send a notification.
-                                            notificationService
-                                                .showNotification(
-                                              id: 1,
-                                              title: 'Astro Flow',
-                                              body:
-                                                  'Time to space out for a bit.',
-                                              sound: 'positive.wav',
-                                            );
-                                          }
-                                        } else {
-                                          // If the stopwatch is not on break, reset the work time.
-                                          timerModel.workTime = 0;
-                                        }
+                                  // If the stopwatch isn't running, show the reset button.
+                                  if (!_stopwatch.isRunning &&
+                                      !timerModel.onBreak)
+                                    IconButton(
+                                      onPressed: () {
+                                        // Reset the stopwatch.
                                         _stopwatch.reset();
-                                      });
-                                    },
-                                    icon:
-                                        const Icon(Icons.arrow_forward_rounded),
-                                  ),
+                                        // Reset the timer.
+                                        timerModel = TimerModel(
+                                          workTime: 0,
+                                          breakTime: 0,
+                                          timeRemaining: 0,
+                                          onBreak: false,
+                                        );
+                                      },
+                                      icon: const Icon(Icons.replay_rounded),
+                                    ),
+                                  if (timerModel.onBreak ||
+                                      _stopwatch.isRunning)
+                                    IconButton(
+                                      onPressed: () async {
+                                        // await player.setSource(AssetSource('sounds/starting-break.wav'));
+                                        setState(() {
+                                          timerModel.onBreak =
+                                              !timerModel.onBreak;
+                                          // If the stopwatch is on break, set the break time.
+                                          if (timerModel.onBreak) {
+                                            var breakTime = calculateBreakTime(
+                                                _stopwatch.elapsedMilliseconds);
+                                            timerModel.timeRemaining =
+                                                breakTime;
+                                            timerModel.breakTime = breakTime;
+                                            timerModel
+                                                    .breakFinishedNotificationSent =
+                                                false;
+
+                                            // Send a notification when starting a break.
+                                            if (timerModel.breakTime > 0) {
+                                              // Send a notification.
+                                              notificationService
+                                                  .showNotification(
+                                                id: 1,
+                                                title: 'Astro Flow',
+                                                body:
+                                                    'Time to space out for a bit.',
+                                                sound: 'positive.wav',
+                                              );
+                                            }
+                                          } else {
+                                            // If the stopwatch is not on break, reset the work time.
+                                            timerModel.workTime = 0;
+                                          }
+                                          _stopwatch.reset();
+                                        });
+                                      },
+                                      icon: const Icon(
+                                          Icons.arrow_forward_rounded),
+                                    ),
                                 ],
                               ),
                             ],
