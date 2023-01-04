@@ -1,3 +1,4 @@
+import 'package:astro_flow/controllers/checklist_controller.dart';
 import 'package:astro_flow/screens/about_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -11,9 +12,11 @@ class MyApp extends StatelessWidget {
   const MyApp({
     super.key,
     required this.settingsController,
+    required this.checklistController,
   });
 
   final SettingsController settingsController;
+  final ChecklistController checklistController;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +77,9 @@ class MyApp extends StatelessWidget {
                   case AboutView.routeName:
                     return const AboutView();
                   default:
-                    return TimerView(controller: settingsController);
+                    return TimerView(
+                        controller: settingsController,
+                        checklistController: checklistController);
                 }
               },
             );

@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:astro_flow/controllers/checklist_controller.dart';
 import 'package:astro_flow/controllers/settings_controller.dart';
 import 'package:astro_flow/models/settings_model.dart';
 import 'package:astro_flow/models/timer_model.dart';
 import 'package:astro_flow/screens/about_view.dart';
 import 'package:astro_flow/screens/settings_view.dart';
 import 'package:astro_flow/services/local_notice_service.dart';
+import 'package:astro_flow/widgets/checklist_widget.dart';
 import 'package:flutter/material.dart';
 
 String formatTime(int milliseconds) {
@@ -17,8 +19,10 @@ String formatTime(int milliseconds) {
 }
 
 class TimerView extends StatelessWidget {
-  const TimerView({super.key, required this.controller});
+  const TimerView(
+      {super.key, required this.controller, required this.checklistController});
   final SettingsController controller;
+  final ChecklistController checklistController;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +59,11 @@ class TimerView extends StatelessWidget {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [StopwatchControl(controller: controller)],
+            children: [
+              StopwatchControl(
+                  controller: controller,
+                  checklistController: checklistController)
+            ],
           ),
         ],
       ),
@@ -65,9 +73,11 @@ class TimerView extends StatelessWidget {
 
 // the timer view
 class StopwatchControl extends StatefulWidget {
-  const StopwatchControl({super.key, required this.controller});
+  const StopwatchControl(
+      {super.key, required this.controller, required this.checklistController});
 
   final SettingsController controller;
+  final ChecklistController checklistController;
 
   @override
   State<StopwatchControl> createState() => _StopwatchControlState();
@@ -286,228 +296,246 @@ class _StopwatchControlState extends State<StopwatchControl> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
-        Stack(
+        Column(
           children: [
-            SizedBox(
-              height: 400,
-              width: 400,
-              child: CircularProgressIndicator(
-                value: timerModel.onBreak
-                    ? timerModel.timeRemaining / timerModel.breakTime
-                    : calculatePercentageDoneToNextInterval(),
-                strokeWidth: 10,
-                backgroundColor: const Color.fromARGB(70, 150, 104, 251),
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 245, 41, 214),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 85,
-              top: 62,
-              child: Column(
-                children: [
-                  Text(
-                    formatTime(timerModel.onBreak
-                        ? timerModel.timeRemaining
-                        : timerModel.workTime),
-                    style: const TextStyle(
-                      fontSize: 60.0,
-                      fontWeight: FontWeight.bold,
-                      // fontFamily: 'Silkscreen',
+            Stack(
+              children: [
+                SizedBox(
+                  height: 400,
+                  width: 400,
+                  child: CircularProgressIndicator(
+                    value: timerModel.onBreak
+                        ? timerModel.timeRemaining / timerModel.breakTime
+                        : calculatePercentageDoneToNextInterval(),
+                    strokeWidth: 10,
+                    backgroundColor: const Color.fromARGB(70, 150, 104, 251),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      Color.fromARGB(255, 245, 41, 214),
                     ),
                   ),
-                  Text(
-                    // If not on break, show the amount of time earned.
-                    timerModel.onBreak
-                        ? ''
-                        : 'Space Out For ${formatTime(timerModel.breakTime)}',
-                    style: const TextStyle(fontSize: 20.0),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Column(
+                ),
+                Positioned(
+                  right: 85,
+                  top: 62,
+                  child: Column(
                     children: [
-                      SizedBox(
-                        width: 200,
-                        height: 100,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 500),
-                          // rounded corners
-                          decoration: timerModel.onBreak
-                              ? BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  gradient: const LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Color.fromARGB(70, 150, 104, 251),
-                                      Color.fromARGB(255, 245, 41, 214),
-                                    ],
-                                  ),
-                                )
-                              : BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  gradient: const LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Color.fromARGB(255, 151, 104, 251),
-                                      Color.fromARGB(255, 245, 41, 214),
-                                    ],
-                                  ),
-                                ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    timerModel.onBreak
-                                        ? 'Spacing Out'
-                                        : _stopwatch.isRunning
-                                            ? 'Focusing'
-                                            : 'Ready to Focus?',
-                                    style: const TextStyle(fontSize: 24),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (!timerModel.onBreak)
-                                    IconButton(
-                                      onPressed: handleStartStop,
-                                      icon: Icon(_stopwatch.isRunning
-                                          ? Icons.pause_rounded
-                                          : Icons.play_arrow_rounded),
-                                    ),
-                                  // If the stopwatch isn't running, show the reset button.
-                                  if (!_stopwatch.isRunning &&
-                                      !timerModel.onBreak)
-                                    IconButton(
-                                      onPressed: () {
-                                        // Reset the stopwatch.
-                                        _stopwatch.reset();
-                                        // Reset the timer.
-                                        timerModel = TimerModel(
-                                          workTime: 0,
-                                          breakTime: 0,
-                                          timeRemaining: 0,
-                                          onBreak: false,
-                                        );
-                                      },
-                                      icon: const Icon(Icons.replay_rounded),
-                                    ),
-                                  if (timerModel.onBreak ||
-                                      _stopwatch.isRunning)
-                                    IconButton(
-                                      onPressed: () async {
-                                        // await player.setSource(AssetSource('sounds/starting-break.wav'));
-                                        setState(() {
-                                          timerModel.onBreak =
-                                              !timerModel.onBreak;
-                                          // If the stopwatch is on break, set the break time.
-                                          if (timerModel.onBreak) {
-                                            var breakTime = calculateBreakTime(
-                                                _stopwatch.elapsedMilliseconds);
-                                            timerModel.timeRemaining =
-                                                breakTime;
-                                            timerModel.breakTime = breakTime;
-                                            timerModel
-                                                    .breakFinishedNotificationSent =
-                                                false;
-
-                                            // Send a notification when starting a break.
-                                            if (timerModel.breakTime > 0) {
-                                              // Send a notification.
-                                              notificationService
-                                                  .showNotification(
-                                                id: 1,
-                                                title: 'Astro Flow',
-                                                body:
-                                                    'Time to space out for a bit.',
-                                                sound: 'positive.wav',
-                                              );
-                                            }
-                                          } else {
-                                            // If the stopwatch is not on break, reset the work time.
-                                            timerModel.workTime = 0;
-                                          }
-                                          _stopwatch.reset();
-                                        });
-                                      },
-                                      icon: const Icon(
-                                          Icons.arrow_forward_rounded),
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ),
+                      Text(
+                        formatTime(timerModel.onBreak
+                            ? timerModel.timeRemaining
+                            : timerModel.workTime),
+                        style: const TextStyle(
+                          fontSize: 60.0,
+                          fontWeight: FontWeight.bold,
+                          // fontFamily: 'Silkscreen',
                         ),
+                      ),
+                      Text(
+                        // If not on break, show the amount of time earned.
+                        timerModel.onBreak
+                            ? ''
+                            : 'Space Out For ${formatTime(timerModel.breakTime)}',
+                        style: const TextStyle(fontSize: 20.0),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Column(
+                        children: [
+                          SizedBox(
+                            width: 200,
+                            height: 100,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 500),
+                              // rounded corners
+                              decoration: timerModel.onBreak
+                                  ? BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color.fromARGB(70, 150, 104, 251),
+                                          Color.fromARGB(255, 245, 41, 214),
+                                        ],
+                                      ),
+                                    )
+                                  : BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color.fromARGB(255, 151, 104, 251),
+                                          Color.fromARGB(255, 245, 41, 214),
+                                        ],
+                                      ),
+                                    ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        timerModel.onBreak
+                                            ? 'Spacing Out'
+                                            : _stopwatch.isRunning
+                                                ? 'Focusing'
+                                                : 'Ready to Focus?',
+                                        style: const TextStyle(fontSize: 24),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (!timerModel.onBreak)
+                                        IconButton(
+                                          onPressed: handleStartStop,
+                                          icon: Icon(_stopwatch.isRunning
+                                              ? Icons.pause_rounded
+                                              : Icons.play_arrow_rounded),
+                                        ),
+                                      // If the stopwatch isn't running, show the reset button.
+                                      if (!_stopwatch.isRunning &&
+                                          !timerModel.onBreak)
+                                        IconButton(
+                                          onPressed: () {
+                                            // Reset the stopwatch.
+                                            _stopwatch.reset();
+                                            // Reset the timer.
+                                            timerModel = TimerModel(
+                                              workTime: 0,
+                                              breakTime: 0,
+                                              timeRemaining: 0,
+                                              onBreak: false,
+                                            );
+                                          },
+                                          icon:
+                                              const Icon(Icons.replay_rounded),
+                                        ),
+                                      if (timerModel.onBreak ||
+                                          _stopwatch.isRunning)
+                                        IconButton(
+                                          onPressed: () async {
+                                            // await player.setSource(AssetSource('sounds/starting-break.wav'));
+                                            setState(() {
+                                              timerModel.onBreak =
+                                                  !timerModel.onBreak;
+                                              // If the stopwatch is on break, set the break time.
+                                              if (timerModel.onBreak) {
+                                                var breakTime =
+                                                    calculateBreakTime(_stopwatch
+                                                        .elapsedMilliseconds);
+                                                timerModel.timeRemaining =
+                                                    breakTime;
+                                                timerModel.breakTime =
+                                                    breakTime;
+                                                timerModel
+                                                        .breakFinishedNotificationSent =
+                                                    false;
+
+                                                // Send a notification when starting a break.
+                                                if (timerModel.breakTime > 0) {
+                                                  // Send a notification.
+                                                  notificationService
+                                                      .showNotification(
+                                                    id: 1,
+                                                    title: 'Astro Flow',
+                                                    body:
+                                                        'Time to space out for a bit.',
+                                                    sound: 'positive.wav',
+                                                  );
+                                                }
+                                              } else {
+                                                // If the stopwatch is not on break, reset the work time.
+                                                timerModel.workTime = 0;
+                                              }
+                                              _stopwatch.reset();
+                                            });
+                                          },
+                                          icon: const Icon(
+                                              Icons.arrow_forward_rounded),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      // A row of four circles, each representing an interval.
+                      // Set the color of the circle from purple to pink, depending on the current interval.
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (var i = 1; i <= 4; i++)
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 500),
+                              margin: const EdgeInsets.all(5),
+                              width: 20,
+                              height: 20,
+                              decoration: timerModel.onBreak
+                                  ? const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color.fromARGB(70, 150, 104, 251),
+                                    )
+                                  : BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: getCurrentInterval(
+                                                  timerModel.workTime) ==
+                                              i
+                                          ? const Color.fromARGB(
+                                              255, 245, 41, 214)
+                                          : const Color.fromARGB(
+                                              70, 150, 104, 251),
+                                    ),
+                            ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  // A row of four circles, each representing an interval.
-                  // Set the color of the circle from purple to pink, depending on the current interval.
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (var i = 1; i <= 4; i++)
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 500),
-                          margin: const EdgeInsets.all(5),
-                          width: 20,
-                          height: 20,
-                          decoration: timerModel.onBreak
-                              ? const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color.fromARGB(70, 150, 104, 251),
-                                )
-                              : BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: getCurrentInterval(
-                                              timerModel.workTime) ==
-                                          i
-                                      ? const Color.fromARGB(255, 245, 41, 214)
-                                      : const Color.fromARGB(70, 150, 104, 251),
-                                ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+                // A circular progress indicator that shows the amount of time left
+                // before break increases.
+              ],
             ),
-            // A circular progress indicator that shows the amount of time left
-            // before break increases.
+            const SizedBox(
+              height: 50,
+            ),
+            // Show the amount of time earned if not on break.
+            if (!timerModel.onBreak) ...[
+              // Description of how long it'll take to get to the next break.
+              if (_intervals[getCurrentInterval(timerModel.workTime)]!
+                      .focusTime !=
+                  null) ...[
+                Text(
+                  'Focus for at least ${formatTime(_intervals[getCurrentInterval(timerModel.workTime)]!.focusTime!)} and you can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!.breakTime)}',
+                  style: const TextStyle(fontSize: 16.0),
+                ),
+              ] else ...[
+                Text(
+                  'You can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!.breakTime)}',
+                  style: const TextStyle(fontSize: 16.0),
+                ),
+              ]
+            ],
           ],
         ),
-        const SizedBox(
-          height: 50,
+        Column(
+          children: [
+            ChecklistWidget(
+              editMode: true,
+              checklistController: widget.checklistController,
+            ),
+          ],
         ),
-        // Show the amount of time earned if not on break.
-        if (!timerModel.onBreak) ...[
-          // Description of how long it'll take to get to the next break.
-          if (_intervals[getCurrentInterval(timerModel.workTime)]!.focusTime !=
-              null) ...[
-            Text(
-              'Focus for at least ${formatTime(_intervals[getCurrentInterval(timerModel.workTime)]!.focusTime!)} and you can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!.breakTime)}',
-              style: const TextStyle(fontSize: 16.0),
-            ),
-          ] else ...[
-            Text(
-              'You can space out for ${formatTime(_intervals[getNextInterval(timerModel.workTime)]!.breakTime)}',
-              style: const TextStyle(fontSize: 16.0),
-            ),
-          ]
-        ],
       ],
     );
   }
