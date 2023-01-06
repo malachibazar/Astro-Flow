@@ -528,14 +528,15 @@ class _StopwatchControlState extends State<StopwatchControl> {
             ],
           ],
         ),
-        Column(
-          children: [
-            ChecklistWidget(
-              editMode: true,
-              checklistController: widget.checklistController,
-            ),
-          ],
-        ),
+        // TODO: Add a checklist widget.
+        // Column(
+        //   children: [
+        //     ChecklistWidget(
+        //       editMode: true,
+        //       checklistController: widget.checklistController,
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }

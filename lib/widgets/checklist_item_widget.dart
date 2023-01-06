@@ -7,7 +7,6 @@
 import 'package:astro_flow/controllers/checklist_controller.dart';
 import 'package:astro_flow/models/checklist_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class ChecklistItem extends StatefulWidget {
   const ChecklistItem(
