@@ -528,7 +528,6 @@ class _StopwatchControlState extends State<StopwatchControl> {
             ],
           ],
         ),
-        // TODO: Add a checklist widget.
         // Column(
         //   children: [
         //     ChecklistWidget(

@@ -1,5 +1,7 @@
 // Service to handle storing and retrieving checklist data
 // from SharedPreferences.
+import 'dart:convert';
+
 import 'package:astro_flow/models/checklist_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,34 +14,39 @@ class ChecklistService {
     // The data is stored as a list of strings.
     // Every other string is the text of the checklist item.
     // Every other string is whether the checklist item is checked off.
-    // Every third string is the id of the checklist item.
     // If the user has not set a checklist, return an empty checklist.
     if (checklist == null) return ChecklistModel(items: []);
 
-    // Otherwise, return the user's checklist.
-    return ChecklistModel(
-      items: List.generate(
-        checklist.length ~/ 2,
-        (index) => ChecklistItemModel(
-          text: checklist[index * 2],
-          checked: checklist[index * 2 + 1] == 'true',
+    // Create a list of items from the data.
+    final items = <ChecklistItemModel>[];
+    for (var i = 0; i < checklist.length; i += 2) {
+      items.add(
+        ChecklistItemModel(
+          id: i ~/ 2,
+          text: checklist[i],
+          checked: checklist[i + 1] == 'true',
         ),
-      ),
-    );
+      );
+    }
+    print(jsonEncode(items.map((item) => item.toMap()).toList()));
+
+    return ChecklistModel(items: items);
   }
 
   // Save the user's checklist to local storage.
   Future<void> saveChecklist(ChecklistModel checklist) async {
     // Save the user's checklist to local storage
     final preferences = await SharedPreferences.getInstance();
+    print(checklist.items
+        .expand((item) => [item.text, item.checked.toString()])
+        .toList()
+        .toString());
+    // The data is stored as a list of strings.
     await preferences.setStringList(
       'checklist',
-      List.generate(
-        checklist.items.length * 2,
-        (index) => index.isEven
-            ? checklist.items[index ~/ 2].text
-            : checklist.items[index ~/ 2].checked.toString(),
-      ),
+      checklist.items
+          .expand((item) => [item.text, item.checked.toString()])
+          .toList(),
     );
   }
 }

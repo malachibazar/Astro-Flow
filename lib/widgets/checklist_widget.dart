@@ -28,10 +28,23 @@ class ChecklistWidget extends StatelessWidget {
         if (editMode)
           ElevatedButton(
             onPressed: () {
-              checklistController.checklist.items
-                  .add(ChecklistItemModel(text: '', checked: false));
+              checklistController.checklist.addItem(
+                ChecklistItemModel(
+                  text: '',
+                  checked: false,
+                ),
+              );
             },
             child: const Text('Add Item'),
+          ),
+        // Button to reset the checklist.
+        if (editMode)
+          ElevatedButton(
+            onPressed: () {
+              checklistController.checklist.items.clear();
+              checklistController.saveChecklist(checklistController.checklist);
+            },
+            child: const Text('Reset Checklist'),
           ),
       ],
     );

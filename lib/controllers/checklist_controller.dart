@@ -20,7 +20,9 @@ class ChecklistController with ChangeNotifier {
   }
 
   // Save the user's checklist to local storage.
-  Future<void> saveChecklist() async {
+  Future<void> saveChecklist(ChecklistModel updatedChecklist) async {
+    _checklist = updatedChecklist;
+    notifyListeners();
     await _checklistService.saveChecklist(_checklist);
   }
 }

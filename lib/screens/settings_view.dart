@@ -47,7 +47,7 @@ class _SettingsViewState extends State<SettingsView> {
           children: [
             Text(
               'Theme',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             DropdownButton<ThemeMode>(
               // Read the selected themeMode from the controller
@@ -72,7 +72,7 @@ class _SettingsViewState extends State<SettingsView> {
             const SizedBox(height: 16.0),
             Text(
               'Auto start work after break',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             Switch(
               // Read the autoStartFocus value from the controller
@@ -84,7 +84,7 @@ class _SettingsViewState extends State<SettingsView> {
             const SizedBox(height: 16.0),
             Text(
               'Send notification after reaching a focus session goal',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             Switch(
               // Read the autoStartFocus value from the controller
@@ -96,7 +96,7 @@ class _SettingsViewState extends State<SettingsView> {
             const SizedBox(height: 16.0),
             Text(
               'Notification Audio',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             DropdownButton<String>(
               // Read the selected notificationAudio from the controller
@@ -117,7 +117,7 @@ class _SettingsViewState extends State<SettingsView> {
                   DropdownMenuItem(
                     value: audio,
                     child: Text(audio),
-                  ),
+                  )
               ],
             ),
           ],

@@ -27,7 +27,7 @@ class AboutView extends StatelessWidget {
             ),
             Text(
               'What is it?',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             const SizedBox(
               width: 400,
@@ -38,7 +38,7 @@ class AboutView extends StatelessWidget {
             // an unordered list of each interval and the time awarded.
             Text(
               'These are the work intervals and the break time awarded for each:',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
             const Text(
               '\u2022 For 25 minutes of work or less, take a five-minute break.\n\u2022 For 25-50 minutes of work, take an eight-minute break.\n\u2022 For 50-90 minutes of work, take a 10-minute break. \n\u2022 For more than 90 minutes of work, take a 15-minute break.\n',

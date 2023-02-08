@@ -4,6 +4,8 @@
 // The checkbox is used to check off the checklist item.
 // The delete button is used to remove the checklist item from the checklist.
 
+import 'dart:convert';
+
 import 'package:astro_flow/controllers/checklist_controller.dart';
 import 'package:astro_flow/models/checklist_model.dart';
 import 'package:flutter/material.dart';
@@ -48,9 +50,17 @@ class _ChecklistItemState extends State<ChecklistItem> {
             IconButton(
               onPressed: () {
                 // Remove the item from the checklist using the item id.
-                widget.checklistController.checklist.items
-                    .removeWhere((element) => element.id == widget.item.id);
-                widget.checklistController.saveChecklist();
+                print(jsonEncode(widget.checklistController.checklist.items
+                        .map((item) => item.toMap())
+                        .toList())
+                    .toString());
+                widget.checklistController.checklist.removeItem(widget.item);
+                print(jsonEncode(widget.checklistController.checklist.items
+                        .map((item) => item.toMap())
+                        .toList())
+                    .toString());
+                widget.checklistController
+                    .saveChecklist(widget.checklistController.checklist);
               },
               icon: const Icon(Icons.delete),
             ),
@@ -62,8 +72,11 @@ class _ChecklistItemState extends State<ChecklistItem> {
                 hintText: 'Checklist Item',
               ),
               onChanged: (value) {
-                widget.item.text = value;
-                widget.checklistController.saveChecklist();
+                widget.checklistController.checklist.items
+                    .firstWhere((item) => item.id == widget.item.id)
+                    .text = value;
+                widget.checklistController
+                    .saveChecklist(widget.checklistController.checklist);
               },
             ),
           ),
@@ -72,8 +85,11 @@ class _ChecklistItemState extends State<ChecklistItem> {
             onChanged: widget.editMode
                 ? (value) {
                     setState(() {
-                      widget.item.checked = value!;
-                      widget.checklistController.saveChecklist();
+                      widget.checklistController.checklist.items
+                          .firstWhere((item) => item.id == widget.item.id)
+                          .checked = value!;
+                      widget.checklistController
+                          .saveChecklist(widget.checklistController.checklist);
                     });
                   }
                 : null,

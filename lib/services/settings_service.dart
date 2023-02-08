@@ -57,7 +57,9 @@ class SettingsService {
     final notificationAudio = preferences.getString('notificationAudio');
 
     // If the user has not set a preferred notification audio, return the system default.
-    if (notificationAudio == null) return 'Chime';
+    if (notificationAudio == null) {
+      return 'ill-make-it-possible-notification.wav';
+    }
 
     // Otherwise, return the user's preferred notification audio.
     return notificationAudio;
