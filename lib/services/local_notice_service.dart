@@ -18,7 +18,6 @@ class LocalNotificationService {
 
     await _localNotificationService.initialize(
       initializationSettings,
-      onSelectNotification: onSelectNotification,
     );
   }
 
@@ -52,10 +51,5 @@ class LocalNotificationService {
       body,
       notificationDetails,
     );
-  }
-
-  void onSelectNotification(String? payload) {
-    // Focus the app when the user clicks on the notification.
-    // This is not implemented yet.
   }
 }
